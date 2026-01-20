@@ -11,6 +11,7 @@ async function getUserProjectIds(userId: string) {
 }
 
 export async function POST(req: NextRequest) {
+  console.log(`[Server Hit] Request received at: ${new Date().toLocaleTimeString()}`);
   let projectId: string | null = null;
 
   try {
@@ -68,10 +69,13 @@ export async function POST(req: NextRequest) {
     }
 
     const baseUrl = process.env.NEXT_FACE_AUTH_URL || "http://localhost:3000";
+
+    const text = await req.text();
+    const body = text ? JSON.parse(text) : {};
     
     const aiResponse = await fetch(`${baseUrl}/api/mock`, {
       method: "POST",
-      body: JSON.stringify(await req.json()), 
+      body: JSON.stringify(body), 
       headers: { "Content-Type": "application/json" }
     });
 
