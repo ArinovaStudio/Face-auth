@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionStatus } from "@prisma/client";
+import { sendWebhook } from "@/lib/webhook";
 
 async function getUserProjectIds(userId: string) {
   const projects = await prisma.project.findMany({
@@ -93,6 +94,11 @@ export async function POST(req: NextRequest) {
     }
 
     const aiData = await aiResponse.json();
+
+    // webhook functionality
+    if (project.webhookUrl) {
+        await sendWebhook(project.webhookUrl, "face_authentication.completed", aiData);
+    }
 
     await prisma.apiLog.create({ data: { projectId, endpoint: "/authenticate", status: 200 }});
 
