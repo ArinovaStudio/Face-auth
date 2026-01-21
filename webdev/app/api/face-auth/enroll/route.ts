@@ -11,7 +11,6 @@ async function getUserProjectIds(userId: string) {
 }
 
 export async function POST(req: NextRequest) {
-  console.log(`[Server Hit] Request received at: ${new Date().toLocaleTimeString()}`);
   let projectId: string | null = null;
 
   try {
@@ -36,7 +35,6 @@ export async function POST(req: NextRequest) {
     }
 
     projectId = project.id;
-
     const sub = project.user.subscription;
 
     if (!sub || sub.status !== SubscriptionStatus.ACTIVE) {
@@ -54,7 +52,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Monthly plan limit reached." }, { status: 429 });
     }
 
-
     //Rate limit of 4 requests per minute
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
     const recentLogs = await prisma.apiLog.count({
@@ -68,22 +65,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json( { success: false, message: "Rate limit exceeded (4 req/min). Please slow down." }, { status: 429 });
     }
 
-    const baseUrl = process.env.NEXT_FACE_AUTH_URL || "http://localhost:3000";
+    const formData = await req.formData();
+    const image = formData.get("image");
+    const userId = formData.get("user_id");
 
-    const text = await req.text();
-    const body = text ? JSON.parse(text) : {};
-    
-    const aiResponse = await fetch(`${baseUrl}/api/mock`, {
+    if (!image || !userId) {
+      return NextResponse.json({ success: false, message: "Missing 'image' or 'user_id'" }, { status: 400 });
+    }
+
+    const aiFormData = new FormData();
+    aiFormData.append("image", image);
+
+    const aiEngineUrl = process.env.NEXT_FACE_AUTH_URL || "http://147.93.86.218:8000";
+    const pythonUrl = `${aiEngineUrl}/enroll?user_id=${userId}`;
+
+    // calling the python face auth api
+    const aiResponse = await fetch(pythonUrl, {
       method: "POST",
-      body: JSON.stringify(body), 
-      headers: { "Content-Type": "application/json" }
+      body: aiFormData,
     });
 
-
     if (!aiResponse.ok) {
-       await prisma.apiLog.create({
-        data: { projectId, endpoint: "/api/mock", status: 500 }
-      });
+      await prisma.apiLog.create({ data: { projectId, endpoint: "/enroll", status: aiResponse.status || 500 }});
 
       return NextResponse.json(
         { success: false, message: "Server busy: You did too many requests, try after sometime." },
@@ -93,14 +96,15 @@ export async function POST(req: NextRequest) {
 
     const aiData = await aiResponse.json();
 
-    await prisma.apiLog.create({
-        data: { projectId, endpoint: "/api/mock", status: 200 }
-    });
+    await prisma.apiLog.create({ data: { projectId, endpoint: "/enroll", status: 200 }});
 
     return NextResponse.json({ success: true, data: aiData });
 
   } catch (error) {
-    console.error("Gateway Error:", error);
+    console.error("Enroll Error:", error);
+    if (projectId) {
+         await prisma.apiLog.create({ data: { projectId, endpoint: "/enroll", status: 500 }});
+    }
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
   }
 }
