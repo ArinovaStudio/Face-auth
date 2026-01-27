@@ -14,6 +14,6 @@ export async function sendWebhook(url: string | null, event: string, payload: an
     });
 
   } catch (error) {
-    console.error("Webhook Failed:", error);
+    throw new Error('Failed to send webhook');
   }
 }

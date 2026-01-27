@@ -56,7 +56,6 @@ export async function PUT( req: NextRequest, { params }: { params: Promise<{ pro
     return NextResponse.json({ success: true, message: "Project updated", project: updatedProject });
 
   } catch (error) {
-    console.error("Update Project Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }
@@ -85,7 +84,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
     return NextResponse.json({ success: true, message: "Project deleted successfully" });
 
   } catch (error) {
-    console.error("Delete Project Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

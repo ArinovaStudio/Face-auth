@@ -40,7 +40,6 @@ export async function PUT( req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ success: true, message: "Plan updated", plan: updatedPlan });
 
   } catch (error) {
-    console.error("Update Plan Error:", error);
     return NextResponse.json({ success: false, message: "Plan not found or update failed" }, { status: 500 });
   }
 }
@@ -70,7 +69,6 @@ export async function DELETE( req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ success: true, message: "Plan deleted successfully" });
 
   } catch (error) {
-    console.error("Delete Plan Error:", error);
     return NextResponse.json({ success: false, message: "Failed to delete plan" }, { status: 500 });
   }
 }

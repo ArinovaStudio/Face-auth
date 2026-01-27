@@ -32,7 +32,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
     return NextResponse.json({ success: true, message: "API Key regenerated successfully", apiKey: updatedProject.apiKey });
 
   } catch (error) {
-    console.error("Renegerate Key Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json( { success: true, message: 'Login successful', user: userWithoutPassword },{ status: 200 });
 
   } catch (error) {
-    console.error('Login Error:', error);
     return NextResponse.json({ success: false, message: 'Internal server error' },{ status: 500 });
   }
 }

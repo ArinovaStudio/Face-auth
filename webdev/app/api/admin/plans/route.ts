@@ -10,7 +10,6 @@ export async function GET() {
     const plans = await prisma.plan.findMany({ orderBy: { monthlyPrice: 'asc' }});
     return NextResponse.json({ success: true, plans });
   } catch (error) {
-    console.error("Error fetching plans:", error);
     return NextResponse.json({ success: false, message: "Failed to fetch plans" }, { status: 500 });
   }
 }
@@ -50,7 +49,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, message: "Plan created", plan }, { status: 201 });
 
   } catch (error) {
-    console.error("Create Plan Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }
