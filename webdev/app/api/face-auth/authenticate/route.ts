@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const aiFormData = new FormData();
     aiFormData.append("image", image);
 
-    const aiEngineUrl = process.env.AI_ENGINE_URL || "http://147.93.86.218:8000";
+    const aiEngineUrl = process.env.NEXT_FACE_AUTH_URL || "http://147.93.86.218:8000";
     const pythonUrl = `${aiEngineUrl}/authenticate`;
 
     const aiResponse = await fetch(pythonUrl, {
