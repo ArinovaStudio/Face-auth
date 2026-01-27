@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: aiData });
 
-  } catch (error) {
+  } catch {
     if (projectId) {
          await prisma.apiLog.create({ data: { projectId, endpoint: "/authenticate", status: 500 }});
     }
